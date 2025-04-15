@@ -1,43 +1,96 @@
 #!/bin/bash
 
+# I thing this part is not necessary..
+
 # Check if running as root
-if [ "$(id -u)" -ne 0 ]; then
-    echo "This script must be run as root. Use 'sudo' or log in as root."
-    exit 1
-fi
+# if [ "$(id -u)" -ne 0 ]; then
+#     echo "This script must be run as root. Use 'sudo' or log in as root."
+#     exit 1
+# fi
+
+aur=$(command -v yay || command -v paru)
 
 # Update the system
-echo "Updating system packages..."
-pacman -Syu --noconfirm
+printf "Updating system packages...\n"
+sudo pacman -Syu --noconfirm
 
-# Install Noto Fonts (Covers most languages)
-echo "Installing Noto Fonts (Universal multilingual support)..."
-pacman -S --noconfirm noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
+# noto fonst
+noto=(
+    noto-fonts 
+    noto-fonts-cjk 
+    noto-fonts-emoji 
+    noto-fonts-extra
+)
 
-# Install additional CJK fonts (Chinese, Japanese, Korean)
-echo "Installing Adobe Source Han fonts (CJK support)..."
-pacman -S --noconfirm adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts
+# asobe source han fonts
+adobe=(
+    adobe-source-han-sans-otc-fonts 
+    adobe-source-han-serif-otc-fonts
+)
 
-# Install Bengali & Indic fonts
-echo "Installing Bengali and Indic fonts..."
-pacman -S --noconfirm ttf-freebanglafont ttf-indic-otf
+# bengali fonts
+bengali=(
+    ttf-freebanglafont
+    ttf-indic-otf
+)
 
-# Install Emoji & Symbol fonts
-echo "Installing Emoji and Symbol fonts..."
-pacman -S --noconfirm ttf-twemoji ttf-symbola
+# emoji and symbol
+emoji=(
+    ttf-twemoji
+    ttf-symbola
+)
 
-# Install fallback fonts (DejaVu, Liberation)
-echo "Installing fallback fonts..."
-pacman -S --noconfirm ttf-dejavu ttf-liberation
+# fallback fonts
+fallback=(
+    ttf-dejavu
+    ttf-liberation
+)
+
+# installation function
+install_fonts() {
+    local fonts=$1
+
+    $aur -S --noconfirm $fonts
+}
+
+# loop for installing fonts
+printf "Installing Noto Fonts (Universal multilingual support)...\n"
+for font in "${noto[@]}"; do
+    install_fonts "$font"
+done
+
+printf "Installing Adobe Source Han fonts (CJK support)...\n"
+for font in "${adobe[@]}"; do
+    install_fonts "$font"
+done
+
+printf "Installing Bengali and Indic fonts...\n"
+for font in "${bengali[@]}"; do
+    install_fonts "$font"
+done
+
+printf "Installing Emoji and Symbol fonts...\n"
+for font in "${emoji[@]}"; do
+    install_fonts "$font"
+done
+
+
+printf "Installing fallback fonts...\n"
+for font in "${fallback[@]}"; do
+    install_fonts "$font"
+done
+
+sleep 1 && clear
 
 # Regenerate font cache
-echo "Regenerating font cache..."
-fc-cache -fv
+printf "Regenerating font cache...\n"
+sudo fc-cache -fv
 
 # Create a basic fontconfig file for better font rendering
-echo "Configuring font preferences..."
+printf "Configuring font preferences..\n"
+
 FONT_CONFIG_FILE="/etc/fonts/local.conf"
-cat > "$FONT_CONFIG_FILE" << 'EOF'
+sudo tee "$FONT_CONFIG_FILE" > /dev/null << 'EOF'
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
 <fontconfig>
@@ -70,5 +123,6 @@ cat > "$FONT_CONFIG_FILE" << 'EOF'
 </fontconfig>
 EOF
 
-echo "Font installation and configuration complete!"
-echo "You may need to restart applications or your system for changes to take full effect."
+echo && sleep 1
+printf "Font installation and configuration complete!\n"
+printf "You may need to restart applications or your system for changes to take full effect.\n"
