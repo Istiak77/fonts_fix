@@ -2,7 +2,8 @@
 
 ## 🚀 Quick Start
 ```sh
-curl -O https://raw.githubusercontent.com/yourusername/repo/main/fonts.sh
+git clone https://github.com/Istiak77/fonts_fix.git
+cd fonts_fix/
 chmod +x fonts.sh
 sudo ./fonts.sh
 
@@ -27,4 +28,3 @@ Installs all required fonts
 Sets up fontconfig preferences
 
 Regenerates font cache
-
