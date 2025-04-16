@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# I thing this part is not necessary..
+# I thinK this part is not necessary..
 
 # Check if running as root
 # if [ "$(id -u)" -ne 0 ]; then
